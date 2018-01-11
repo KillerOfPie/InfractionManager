@@ -23,20 +23,64 @@ package com.killerofpie.infractionmanager.objects;
 
 import com.killerofpie.infractionmanager.util.InfractionType;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 
 public class Infraction {
 
 	private UUID[] players;
-	private Date time;
+	private LocalDate time;
 	private String reason;
 	private InfractionType type;
 
-	public Infraction(String type, UUID[] players, Date time, String reason) {
+	public Infraction(String type, UUID[] players, LocalDate time, String reason) {
 		this.type = new InfractionType(type);
 		this.players = players;
 		this.time = time;
 		this.reason = reason;
+	}
+
+	public Infraction(String type, UUID player, LocalDate time, String reason) {
+		this.type = new InfractionType(type);
+		this.players[0] = player;
+		this.time = time;
+		this.reason = reason;
+	}
+
+	public UUID[] getPlayers() {
+		return players;
+	}
+
+	public LocalDate getTime() {
+		return time;
+	}
+
+	public String getReason() {
+		return reason;
+	}
+
+	public InfractionType getType() {
+		return type;
+	}
+
+	public Map<String, Object> toMap() {
+		Map<String, Object> tempMap = new TreeMap<>();
+		tempMap.put("type", type.getName());
+		tempMap.put("players", players);
+		tempMap.put("reason", reason);
+		tempMap.put("time", time.toString());
+
+		return tempMap;
+	}
+
+	public static Infraction fromMap(Map<String, Object> map) {
+		UUID[] players = (UUID[]) map.get("players");
+		LocalDate time = LocalDate.parse(map.get("time").toString());
+		String reason = map.get("reason").toString();
+		String type = map.get("type").toString();
+
+		return new Infraction(type, players, time, reason);
 	}
 }

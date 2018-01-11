@@ -7,14 +7,14 @@ import java.util.Map;
 
 public class InfractionType {
 
-	private String type;
+	private String name;
 	private Map<Integer, String> punishments;
 	private int decay;
 
 	private InfractionManager plugin = (InfractionManager) Bukkit.getPluginManager().getPlugin("InfractionManager");
 
-	public InfractionType(String type, int decay, Map<Integer, String> punishments) {
-		this.type = type;
+	public InfractionType(String name, int decay, Map<Integer, String> punishments) {
+		this.name = name;
 		this.decay = decay;
 		this.punishments = punishments;
 	}
@@ -26,7 +26,7 @@ public class InfractionType {
 
 		InfractionType it = plugin.getTypeConfig().readInfraction(type);
 
-		this.type = it.getType();
+		this.name = it.getName();
 		this.decay = it.getDecay();
 		this.punishments = it.getPunishments();
 	}
@@ -39,8 +39,8 @@ public class InfractionType {
 		return punishments.get(punNum);
 	}
 
-	public String getType() {
-		return type;
+	public String getName() {
+		return name;
 	}
 
 	public int getDecay() {
