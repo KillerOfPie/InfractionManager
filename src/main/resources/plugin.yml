@@ -1,0 +1,12 @@
+name: InfractionManager
+version: 0.0.0-DEV
+main: com.killerofpie.infractionmanager.InfractionManager
+
+author: KillerOfPie
+description: A plugin for server staff to track and manage players who break server rules.
+website: n/a
+
+commands:
+  infraction:
+    description: Core command for Infraction Manager
+    aliases: [infractionmanager, ticket]
