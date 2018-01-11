@@ -19,26 +19,24 @@
  * caused by their contribution(s) to the project. See the full License for more information
  */
 
-package com.killerofpie.infractionmanager;
+package com.killerofpie.infractionmanager.objects;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import com.killerofpie.infractionmanager.util.InfractionType;
 
-public class Executor implements CommandExecutor {
+import java.util.Date;
+import java.util.UUID;
 
-	private InfractionManager plugin;
+public class Infraction {
 
-	public Executor(InfractionManager instance) {
-		plugin = instance;
+	private UUID[] players;
+	private Date time;
+	private String reason;
+	private InfractionType type;
+
+	public Infraction(String type, UUID[] players, Date time, String reason) {
+		this.type = new InfractionType(type);
+		this.players = players;
+		this.time = time;
+		this.reason = reason;
 	}
-
-	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		//subCommands: new/create, view/check, remove/delete, reset, help, reload
-		//commandKeys: type, player/players, reason
-
-		return false;
-	}
-
 }

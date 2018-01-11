@@ -21,19 +21,25 @@
 
 package com.killerofpie.infractionmanager;
 
+import com.killerofpie.infractionmanager.configs.TypeConfig;
 import com.killerofpie.infractionmanager.util.BukkitVersion;
 import com.killerofpie.infractionmanager.util.Updater;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class InfractionManager extends JavaPlugin {
 	private final BukkitVersion VERSION = new BukkitVersion();
 	private Metrics metrics;
+	private TypeConfig typeConfig;
+
+	public TypeConfig getTypeConfig() {
+		return typeConfig;
+	}
 
 	@Override
 	public void onEnable() {
-		PluginManager pm = getServer().getPluginManager();
+		saveDefaultConfig();
+		typeConfig = new TypeConfig(this);
 
 		getCommand("infraction").setExecutor(new Executor(this));
 
