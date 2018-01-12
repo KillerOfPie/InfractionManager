@@ -58,7 +58,57 @@ public class Executor implements CommandExecutor {
 		if (cmd.getName().equalsIgnoreCase("infraction")) {
 
 			//Help Command
-			if (args[0].equalsIgnoreCase("reload")) {
+			if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
+				PluginDescriptionFile pdf = plugin.getDescription();
+				StringBuilder sb = new StringBuilder();
+				String msg;
+
+				sb.append("\n");
+				sb.append("&2" + pdf.getName() + " " + pdf.getVersion() + " by " + pdf.getAuthors().get(0) + "\n");
+				sb.append("\n");
+				sb.append("\n");
+				sb.append("&6/infraction      \n  &6- Base plugin command");
+				sb.append("\n");
+				sb.append("&6/infraction help \n  &6- Display help message");
+				sb.append("\n");
+
+				if (sender.hasPermission("InfractionManager.reset")) {
+					sb.append("&6/infraction reset p <player(s)> \n  &6- Completely resets the player(s) infractions");
+					sb.append("\n");
+				}
+
+				if (sender.hasPermission("InfractionManager.reload")) {
+					sb.append("&6/infraction reload \n  &6- Reloads the plugins configuration files");
+					sb.append("\n");
+				}
+
+				if (sender.hasPermission("InfractionManager.remove")) {
+					sb.append("&6/infraction remove p <player> t <infraction type> n <number> \n  &6- Removes an infraction from a player");
+					sb.append("\n");
+				}
+
+				if (sender.hasPermission("InfractionManager.view.other")) {
+					sb.append("&6/infraction view [t <type>] [p <player>] \n  &6- Shows all infractions on player or self if no player specified");
+					sb.append("\n");
+				} else if (sender.hasPermission("InfractionManager.view")) {
+					sb.append("&6/infraction view [t <type>] \n  &6- Shows all of your infractions");
+					sb.append("\n");
+				}
+
+				if (sender.hasPermission("InfractionManager.create")) {
+					sb.append("&6/infraction create p <player(s)> t <infraction type> r <reason message> \n  &6- Creates a infraction on the player(s)");
+					sb.append("\n");
+				}
+
+				msg = sb.toString();
+
+				sender.sendMessage(colorize(msg));
+
+				return true;
+			}
+
+			//Reload Command
+			else if (args[0].equalsIgnoreCase("reload")) {
 				if (!sender.hasPermission("InfractionManager.reload")) {
 					sender.sendMessage(colorize("&cYou don't have permission for that!"));
 					return true;
@@ -71,55 +121,6 @@ public class Executor implements CommandExecutor {
 				return true;
 			}
 
-			//Help Command
-			else if (args[0].equalsIgnoreCase("help") || args.length == 0) {
-				PluginDescriptionFile pdf = plugin.getDescription();
-				StringBuilder sb = new StringBuilder();
-				String msg;
-
-				sb.append("\n");
-				sb.append("&2" + pdf.getName() + " " + pdf.getVersion() + " by " + pdf.getAuthors().get(0) + "\n");
-				sb.append("\n");
-				sb.append("\n");
-				sb.append("&6/infraction      &c - Base plugin command");
-				sb.append("\n");
-				sb.append("&6/infraction help &c - Display help message");
-				sb.append("\n");
-
-				if (sender.hasPermission("InfractionManager.reset")) {
-					sb.append("&6/infraction reset p <player(s)> - Completely resets the player(s) infractions");
-					sb.append("\n");
-				}
-
-				if (sender.hasPermission("InfractionManager.reload")) {
-					sb.append("&6/infraction reload - Reloads the plugins configuration files");
-					sb.append("\n");
-				}
-
-				if (sender.hasPermission("InfractionManager.remove")) {
-					sb.append("&6/infraction remove p <player> t <infraction type> n <number> - Removes an infraction from a player");
-					sb.append("\n");
-				}
-
-				if (sender.hasPermission("InfractionManager.view.other")) {
-					sb.append("&6/infraction view [t <type>] [p <player>] - Shows all infractions on player or self if no player specified");
-					sb.append("\n");
-				} else if (sender.hasPermission("InfractionManager.view")) {
-					sb.append("&6/infraction view [t <type>] - Shows all of your infractions");
-					sb.append("\n");
-				}
-
-				if (sender.hasPermission("InfractionManager.create")) {
-					sb.append("&6/infraction create p <player(s)> t <infraction type> r <reason message> - Creates a infraction on the player(s)");
-					sb.append("\n");
-				}
-
-				msg = sb.toString();
-
-				sender.sendMessage(colorize(msg));
-
-				return true;
-			}
 
 			//Reset Command
 			else if (args[0].equalsIgnoreCase("reset")) {
@@ -389,7 +390,7 @@ public class Executor implements CommandExecutor {
 				if (players.size() < 1) {
 					sender.sendMessage(colorize("&cYou need to use the parameter 'p' followed by player names!"));
 					return true;
-				} else if (plugin.getTypeConfig().isInfraction(type)) {
+				} else if (!plugin.getTypeConfig().isInfraction(type)) {
 					sender.sendMessage(colorize("&cYou need to use the parameter 't' followed by the type of infraction!"));
 					return true;
 				} else if (reason.equalsIgnoreCase("")) {
@@ -459,37 +460,38 @@ public class Executor implements CommandExecutor {
 				mode = "d";
 			} else if (pageKeys.contains(check)) {
 				mode = "pg";
-			}
+			} else {
 
-			switch (mode) {
-				case "p":
-					players.add(check);
-					break;
-				case "t":
-					type = check;
-					break;
-				case "r":
-					reason.append(check + " ");
-					break;
-				case "n":
-					if (isInt(check))
-						numbers.add(Integer.parseInt(check));
-					break;
-				case "l":
-					if (isInt(check) && Integer.parseInt(check) > 0)
-						limit = Integer.parseInt(check);
-					break;
-				case "d":
-					if (Boolean.parseBoolean(check))
-						decay = Boolean.parseBoolean(check);
-					break;
-				case "pg":
-					if (isInt(check) && Integer.parseInt(check) > 0)
-						page = Integer.parseInt(check);
-					break;
-				default:
-					//do nothing
-					break;
+				switch (mode) {
+					case "p":
+						players.add(check);
+						break;
+					case "t":
+						type = check;
+						break;
+					case "r":
+						reason.append(check + " ");
+						break;
+					case "n":
+						if (isInt(check))
+							numbers.add(Integer.parseInt(check));
+						break;
+					case "l":
+						if (isInt(check) && Integer.parseInt(check) > 0)
+							limit = Integer.parseInt(check);
+						break;
+					case "d":
+						if (Boolean.parseBoolean(check))
+							decay = Boolean.parseBoolean(check);
+						break;
+					case "pg":
+						if (isInt(check) && Integer.parseInt(check) > 0)
+							page = Integer.parseInt(check);
+						break;
+					default:
+						//do nothing
+						break;
+				}
 			}
 		}
 

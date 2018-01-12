@@ -17,7 +17,8 @@ import java.util.logging.Level;
 
 public class PlayerStorage {
 	private InfractionManager plugin = (InfractionManager) Bukkit.getPluginManager().getPlugin("InfractionManager");
-	private File file;
+	private File file, folder = new File(plugin.getDataFolder() + File.pathSeparator + "data" + File.pathSeparator);
+	;
 	private FileConfiguration config;
 
 	private UUID uuid;
@@ -124,8 +125,8 @@ public class PlayerStorage {
 
 	public void load() {
 		try {
-			if (!plugin.getDataFolder().isDirectory()) {
-				plugin.getDataFolder().mkdirs();
+			if (!folder.isDirectory()) {
+				folder.mkdirs();
 			}
 			if (!file.exists()) {
 				file.createNewFile();

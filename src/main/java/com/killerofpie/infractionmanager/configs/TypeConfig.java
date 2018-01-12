@@ -15,8 +15,8 @@ import java.util.logging.Level;
 public class TypeConfig {
 
 	private InfractionManager plugin;
-	private File file = new File(plugin.getDataFolder(), "infractions.yml");
-	private FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+	private File file;
+	private FileConfiguration config;
 
 	public TypeConfig(InfractionManager instance) {
 		plugin = instance;
@@ -37,6 +37,7 @@ public class TypeConfig {
 			if (!plugin.getDataFolder().isDirectory()) {
 				plugin.getDataFolder().mkdirs();
 			}
+			file = new File(plugin.getDataFolder(), "infractions.yml");
 			if (!file.exists()) {
 				file.createNewFile();
 			}
@@ -85,7 +86,7 @@ public class TypeConfig {
 		for (String s : sec.getConfigurationSection("punishments").getKeys(false)) {
 			try {
 				int i = Integer.parseInt(s);
-				temp.put(i, sec.getString("punishments" + i));
+				temp.put(i, sec.getString("punishments." + i));
 			} catch (NumberFormatException nfe) {
 				plugin.getLogger().log(Level.WARNING, "[InfractionManager] Could not read a punishment from file!");
 			}
