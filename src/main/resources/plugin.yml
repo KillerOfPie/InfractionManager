@@ -9,4 +9,4 @@ website: n/a
 commands:
   infraction:
     description: Core command for Infraction Manager
-    aliases: [infractionmanager, ticket]
+    aliases: [infractionmanager, ticket, it]

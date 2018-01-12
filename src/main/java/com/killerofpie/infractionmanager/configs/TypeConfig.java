@@ -51,14 +51,14 @@ public class TypeConfig {
 
 	private void setDefaults() {
 		Map<Integer, String> punishments = new TreeMap<>();
-		punishments.put(1, "You have received and infraction for %type%, this is %num%");
-		punishments.put(2, "You have received and infraction for %type%, this is %num%");
-		punishments.put(4, "You have received and infraction for %type%, this is %num%");
+		punishments.put(1, "You have received an infraction for %type%, this is %num%");
+		punishments.put(2, "You have received an infraction for %type%, this is %num%");
+		punishments.put(4, "You have received an infraction for %type%, this is %num%");
 
 		addInfraction("grief", 30, punishments);
-		addInfraction("spam", 30, punishments);
-		addInfraction("advertising", 30, punishments);
-		addInfraction("other", 30, punishments);
+		addInfraction("spam", 10, punishments);
+		addInfraction("advertising", 15, punishments);
+		addInfraction("other", 15, punishments);
 
 		save();
 	}
