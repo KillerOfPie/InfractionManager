@@ -5,8 +5,10 @@ This plugin helps server staff track and manage players who break server rules.
 
 #### Author: KillerOfPie
 #### Name: InfractionManager
-#### Version: v0.0.0-DEV
-#### Tested MC versions: None
+#### Version: v1.0.0-BETA
+#### Tested MC versions: 1.12.X
+
+#### Requires Java 8 or higher!
 
 
 ## Downloads
