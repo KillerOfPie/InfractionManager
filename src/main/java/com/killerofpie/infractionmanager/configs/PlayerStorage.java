@@ -72,12 +72,13 @@ public class PlayerStorage {
 
 	public Map<String, Infraction> getInfractionsOfType(String type, boolean useDecay) {
 		Map<String, Infraction> infractions = Maps.newHashMap();
+		int decayTime = plugin.getTypeConfig().readInfraction(type).getDecay();
 		if (plugin.getTypeConfig().isInfraction(type) && config.getKeys(false).contains(type)) {
 			ConfigurationSection sec = config.getConfigurationSection(type);
 
 			for (String i : sec.getKeys(false)) {
 				if (useDecay) {
-					if (!olderThan(config.getString(type + "." + i + ".time"), plugin.getTypeConfig().readInfraction(type).getDecay())) {
+					if (!olderThan(config.getString(type + "." + i + ".time"), decayTime)) {
 						infractions.put(i + "", Infraction.fromMap(sec.getConfigurationSection(i).getValues(true)));
 					}
 				} else {
@@ -87,6 +88,10 @@ public class PlayerStorage {
 		}
 
 		return infractions;
+	}
+
+	public int getInfractionCountOfType(String type, boolean useDecay) {
+		return getInfractionsOfType(type, useDecay).size();
 	}
 
 	public Map<String, Integer> getTotalInfractionCount() {
@@ -133,6 +138,8 @@ public class PlayerStorage {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+
+		load();
 	}
 
 	public void load() {

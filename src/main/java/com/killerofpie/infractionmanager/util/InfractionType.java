@@ -31,12 +31,12 @@ public class InfractionType {
 		this.punishments = it.getPunishments();
 	}
 
-	public String getPunishment(int punNum) {
-		if (!punishments.containsKey(punNum)) {
+	public String getPunishment(int num) {
+		if (!punishments.containsKey(num)) {
 			return "";
 		}
 
-		return punishments.get(punNum);
+		return punishments.get(num);
 	}
 
 	public String getName() {
