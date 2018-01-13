@@ -17,14 +17,15 @@ import java.util.logging.Level;
 
 public class PlayerStorage {
 	private InfractionManager plugin = (InfractionManager) Bukkit.getPluginManager().getPlugin("InfractionManager");
-	private File file, folder = new File(plugin.getDataFolder() + File.pathSeparator + "data" + File.pathSeparator);
-	;
+	private File file, folder;
+
 	private FileConfiguration config;
 
 	private UUID uuid;
 
 	public PlayerStorage(UUID uuid) {
-		file = new File(plugin.getDataFolder() + File.pathSeparator + "data", uuid.toString() + ".yml");
+		folder = new File(plugin.getDataFolder() + File.separator + "data");
+		file = new File(folder, uuid.toString() + ".yml");
 		this.uuid = uuid;
 
 		load();
@@ -50,6 +51,12 @@ public class PlayerStorage {
 		}
 
 		config.set(path, null);
+
+		for (int i = num + 1; i < config.getConfigurationSection(type).getKeys(false).size(); i++) {
+			config.set((i - 1) + "", config.get(i + ""));
+			config.set(i + "", null);
+		}
+
 		save();
 	}
 
@@ -70,7 +77,7 @@ public class PlayerStorage {
 
 			for (String i : sec.getKeys(false)) {
 				if (useDecay) {
-					if (!olderThan(config.getString(type + i), plugin.getTypeConfig().readInfraction(type).getDecay())) {
+					if (!olderThan(config.getString(type + "." + i + ".time"), plugin.getTypeConfig().readInfraction(type).getDecay())) {
 						infractions.put(i + "", Infraction.fromMap(sec.getConfigurationSection(i).getValues(true)));
 					}
 				} else {
@@ -86,7 +93,8 @@ public class PlayerStorage {
 		Map<String, Integer> count = Maps.newHashMap();
 
 		for (String key : config.getKeys(false)) {
-			count.put(key, config.getConfigurationSection(key).getKeys(false).size());
+			if (!key.equalsIgnoreCase("ResetOn"))
+				count.put(key, config.getConfigurationSection(key).getKeys(false).size());
 		}
 
 		return count;
@@ -98,7 +106,7 @@ public class PlayerStorage {
 		for (String key : config.getKeys(false)) {
 			int counter = 0;
 			for (String num : config.getConfigurationSection(key).getKeys(false)) {
-				if (!olderThan(config.getString(key + num), plugin.getTypeConfig().readInfraction(key).getDecay())) {
+				if (!olderThan(config.getString(key + "." + num + ".time"), plugin.getTypeConfig().readInfraction(key).getDecay())) {
 					counter++;
 				}
 			}
@@ -109,7 +117,11 @@ public class PlayerStorage {
 	}
 
 	public void clearInfractions() {
-		config.set("", null);
+		for (String key : config.getKeys(false)) {
+			if (!key.equalsIgnoreCase("ResetOn")) {
+				config.set(key, null);
+			}
+		}
 		config.set("ResetOn", LocalDate.now().toString());
 		save();
 	}
@@ -140,8 +152,7 @@ public class PlayerStorage {
 	}
 
 	private boolean olderThan(String date, int daysOld) {
-		LocalDate toCheck = LocalDate.parse(date);
-		return toCheck.isBefore(LocalDate.now().minusDays(daysOld));
+		return LocalDate.parse(date).isBefore(LocalDate.now().minusDays(daysOld));
 	}
 
 }

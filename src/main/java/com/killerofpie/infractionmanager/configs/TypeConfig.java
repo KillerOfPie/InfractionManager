@@ -1,5 +1,6 @@
 package com.killerofpie.infractionmanager.configs;
 
+import com.google.common.collect.Lists;
 import com.killerofpie.infractionmanager.InfractionManager;
 import com.killerofpie.infractionmanager.util.InfractionType;
 import org.bukkit.configuration.ConfigurationSection;
@@ -8,6 +9,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -67,8 +69,17 @@ public class TypeConfig {
 	private void addInfraction(String node, int decay, Map<Integer, String> punishments) {
 		if (config.get(node) == null) {
 			config.set(node + ".decay", decay);
-			config.set(node + ".punishments", punishments);
+			for (Map.Entry<Integer, String> entry : punishments.entrySet()) {
+				config.set(node + ".punishments." + entry.getKey(), entry.getValue());
+			}
 		}
+	}
+
+	public List<InfractionType> getInfractionSet() {
+		List<InfractionType> infractionSet = Lists.newArrayList();
+		config.getKeys(false).forEach(key -> infractionSet.add(readInfraction(key)));
+
+		return infractionSet;
 	}
 
 	public boolean isInfraction(String node) {

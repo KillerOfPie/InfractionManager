@@ -1,2 +1,4 @@
 check-for-updates: true
 allow-metrics: true
+broadcast: false
+enable-decay: true

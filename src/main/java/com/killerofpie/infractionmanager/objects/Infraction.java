@@ -24,6 +24,7 @@ package com.killerofpie.infractionmanager.objects;
 import com.killerofpie.infractionmanager.util.InfractionType;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -31,6 +32,7 @@ import java.util.UUID;
 public class Infraction {
 
 	private UUID[] players;
+	private String[] playersString;
 	private LocalDate time;
 	private String reason;
 	private InfractionType type;
@@ -40,6 +42,8 @@ public class Infraction {
 		this.players = players;
 		this.time = time;
 		this.reason = reason;
+
+		uuidToStrings();
 	}
 
 	public Infraction(String type, UUID player, LocalDate time, String reason) {
@@ -47,6 +51,26 @@ public class Infraction {
 		this.players[0] = player;
 		this.time = time;
 		this.reason = reason;
+
+		uuidToStrings();
+	}
+
+	public Infraction(String type, String[] players, LocalDate time, String reason) {
+		this.type = new InfractionType(type);
+		this.playersString = players;
+		this.time = time;
+		this.reason = reason;
+
+		stringToUUIDs();
+	}
+
+	public Infraction(String type, String player, LocalDate time, String reason) {
+		this.type = new InfractionType(type);
+		this.playersString[0] = player;
+		this.time = time;
+		this.reason = reason;
+
+		stringToUUIDs();
 	}
 
 	public UUID[] getPlayers() {
@@ -68,7 +92,7 @@ public class Infraction {
 	public Map<String, Object> toMap() {
 		Map<String, Object> tempMap = new TreeMap<>();
 		tempMap.put("type", type.getName());
-		tempMap.put("players", players);
+		tempMap.put("players", playersString);
 		tempMap.put("reason", reason);
 		tempMap.put("time", time.toString());
 
@@ -76,11 +100,30 @@ public class Infraction {
 	}
 
 	public static Infraction fromMap(Map<String, Object> map) {
-		UUID[] players = (UUID[]) map.get("players");
+		ArrayList<String> pls = (ArrayList<String>) map.get("players");
+		String[] players = new String[pls.size()];
+		for (int i = 0; i < pls.size(); i++) {
+			players[i] = pls.get(i);
+		}
+
 		LocalDate time = LocalDate.parse(map.get("time").toString());
 		String reason = map.get("reason").toString();
 		String type = map.get("type").toString();
 
 		return new Infraction(type, players, time, reason);
+	}
+
+	private void uuidToStrings() {
+		playersString = new String[players.length];
+		for (int i = 0; i < players.length; i++) {
+			playersString[i] = players[i].toString();
+		}
+	}
+
+	private void stringToUUIDs() {
+		players = new UUID[playersString.length];
+		for (int i = 0; i < playersString.length; i++) {
+			players[i] = UUID.fromString(playersString[i]);
+		}
 	}
 }
