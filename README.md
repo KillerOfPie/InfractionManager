@@ -8,6 +8,7 @@ This plugin helps server staff track and manage players who break server rules.
 #### Version: v1.0.0-BETA
 #### Tested MC versions: 1.12.X
 
+
 #### Requires Java 8 or higher!
 
 
