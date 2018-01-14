@@ -21,7 +21,6 @@
 
 package com.killerofpie.infractionmanager;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.killerofpie.infractionmanager.configs.PlayerStorage;
@@ -29,6 +28,7 @@ import com.killerofpie.infractionmanager.objects.Infraction;
 import com.killerofpie.infractionmanager.util.InfractionType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -37,14 +37,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
 
 public class Executor implements CommandExecutor {
 
@@ -192,7 +190,7 @@ public class Executor implements CommandExecutor {
 					sb.append(player + " ");
 				}
 
-				sender.sendMessage(colorize("&aThe listed players don't had any infractions matching the type and numbers removed."));
+				sender.sendMessage(colorize("&aAny infractions matching these parameters have been removed."));
 				sender.sendMessage(colorize("&aPlayers: &e" + sb.toString()));
 				sender.sendMessage(colorize("&aType: &e" + type));
 				sender.sendMessage(colorize("&aNumbers: &e" + numbers));
@@ -226,7 +224,7 @@ public class Executor implements CommandExecutor {
 								countsDecay = ps.getDecayInfractionCount();
 
 						sb.append("&2Infractions of " + player.getName() + "\n");
-						sb.append("&aInfraction Type-Total-Active \n");
+						sb.append("&aInfraction Type-Total-Active \n&0");
 
 						for (String key : countsTotal.keySet()) {
 							if (countsDecay.containsKey(key)) {
@@ -234,6 +232,10 @@ public class Executor implements CommandExecutor {
 							} else {
 								sb.append("&e" + key + "-" + countsTotal.get(key) + "-0\n");
 							}
+						}
+
+						if ((sb.charAt(sb.length() - 1) + "").equalsIgnoreCase("0")) {
+							sb.append("&e" + player + " has no infractions.");
 						}
 
 						sb.append("&2To see a list of infractions use the parameter: 't <type>'");
@@ -250,7 +252,7 @@ public class Executor implements CommandExecutor {
 
 						for (String player : players) {
 							sb.append("&2Infractions of " + player + "\n");
-							sb.append("&aInfraction Type-Total-Active \n");
+							sb.append("&aInfraction Type-Total-Active \n&0");
 
 							Map<String, Integer> countsTotal = ps.get(player).getTotalInfractionCount(),
 									countsDecay = ps.get(player).getDecayInfractionCount();
@@ -261,6 +263,10 @@ public class Executor implements CommandExecutor {
 								} else {
 									sb.append("&e" + key + "-" + countsTotal.get(key) + "-0\n");
 								}
+							}
+
+							if ((sb.charAt(sb.length() - 1) + "").equalsIgnoreCase("0")) {
+								sb.append("&e" + player + " has no infractions.");
 							}
 
 						}
@@ -308,7 +314,7 @@ public class Executor implements CommandExecutor {
 						}
 
 						sb.append("&2Infractions of &e" + player.getName() + "\n");
-						sb.append("&aType: " + type + "-Total: " + countsTotal.get(type) + "-Active: " + countsDecay.get(type) + " \n");
+						sb.append("&aType: " + type + "-Total: " + countsTotal.get(type) + "-Active: " + countsDecay.get(type) + " \n&0");
 
 						for (int i = lowerLimit; i <= upperLimit; i++) {
 							Infraction infraction = infractions.get(i + "");
@@ -323,6 +329,10 @@ public class Executor implements CommandExecutor {
 								sb.append("  &aReason: &e" + infraction.getReason() + "\n");
 							}
 
+						}
+
+						if ((sb.charAt(sb.length() - 1) + "").equalsIgnoreCase("0")) {
+							sb.append("&e" + player + " has no infractions.");
 						}
 
 						sb.append("&2To see a different page use the parameter: 'pg <number>'\n");
@@ -369,7 +379,7 @@ public class Executor implements CommandExecutor {
 							}
 
 							sb.append("&2Infractions of &e" + player + "\n");
-							sb.append("&aType: " + type + "-Total: " + countsTotal.get(type) + "-Active: " + countsDecay.get(type) + " \n");
+							sb.append("&aType: " + type + "-Total: " + countsTotal.get(type) + "-Active: " + countsDecay.get(type) + " \n&0");
 
 							for (int i = lowerLimit; i <= upperLimit; i++) {
 								Infraction infraction = infractions.get(i + "");
@@ -382,6 +392,10 @@ public class Executor implements CommandExecutor {
 								sb.append("  &aTime: &e" + infraction.getTime().toString() + "\n");
 								sb.append("  &aReason: &e" + infraction.getReason() + "\n");
 
+							}
+
+							if ((sb.charAt(sb.length() - 1) + "").equalsIgnoreCase("0")) {
+								sb.append("&e" + player + " has no infractions.");
 							}
 						}
 
@@ -437,16 +451,10 @@ public class Executor implements CommandExecutor {
 					int num = ps.getInfractionCountOfType(type, plugin.getConfig().getBoolean("enable-decay"));
 					InfractionType infractionType = plugin.getTypeConfig().readInfraction(type);
 
-					if (infractionType.getPunishment(num).equalsIgnoreCase("")) {
-
-						plugin.getLogger().log(Level.INFO, plugin.getTypeConfig().readInfraction(type).getPunishment(num)
+					if (!infractionType.getPunishment(num).equalsIgnoreCase("")) {
+						plugin.getServer().dispatchCommand(console, infractionType.getPunishment(num)
 								.replaceAll("%player%", Bukkit.getOfflinePlayer(uuid).getName())
-								.replaceAll("%sender%", sender.toString())
-								.replaceAll("%type%", type)
-								.replaceAll("%num%", num + ""));
-						plugin.getServer().dispatchCommand(console, plugin.getTypeConfig().readInfraction(type).getPunishment(num)
-								.replaceAll("%player%", Bukkit.getOfflinePlayer(uuid).getName())
-								.replaceAll("%sender%", sender.toString())
+								.replaceAll("%sender%", sender.getName())
 								.replaceAll("%type%", type)
 								.replaceAll("%num%", num + ""));
 					}
@@ -474,10 +482,9 @@ public class Executor implements CommandExecutor {
 				}
 
 				for (Player player : plugin.getServer().getOnlinePlayers()) {
-					if (players.contains(player.getName())) {
+					if (players.contains(player.getName().toLowerCase())) {
 						PlayerStorage ps = new PlayerStorage(player.getUniqueId());
-						player.sendMessage("&cYou have been warned for &e" + type + " &c! " +
-								"\nYou have &e" + ps.getInfractionCountOfType(type, plugin.getConfig().getBoolean("enable-decay")) + " &cinfractions for &e" + type + "&c.");
+						player.sendMessage(colorize("&cYou have been warned for &e" + type + " &c! \nYou have &e" + ps.getInfractionCountOfType(type, plugin.getConfig().getBoolean("enable-decay")) + " &cinfractions for &e" + type + "&c."));
 					} else if ((toBroadcast || player.hasPermission("InfractionManager.notify")) && !player.getName().equalsIgnoreCase(sender.getName())) {
 						player.sendMessage(colorize(broadcast.toString()));
 					}
@@ -518,17 +525,19 @@ public class Executor implements CommandExecutor {
 				}
 
 				sb.append("&2List of infraction types\n");
-				sb.append("&2Showing " + (upperLimit - lowerLimit) + " out of " + types.size() + "\n");
+				sb.append("&2Showing " + lowerLimit + "-" + upperLimit + " out of " + types.size() + "\n");
 
 				for (int i = lowerLimit; i <= upperLimit; i++) {
-					InfractionType infraction = types.get(i);
+					InfractionType infraction = types.get(i - 1);
 					if (infraction != null) {
-						sb.append("&a" + i + ":\n");
-						sb.append("  &aName:&e " + infraction.getName() + "\n");
-						sb.append("  &aDecay:&e " + infraction.getDecay() + " days\n");
-						sb.append("  &aPunishments:&e \n");
-						for (Map.Entry<Integer, String> entry : infraction.getPunishments().entrySet()) {
-							sb.append("    &a" + entry.getKey() + ":&e " + entry.getValue() + " \n");
+						sb.append("&aName:&e " + infraction.getName() + "\n");
+
+						if (sender.hasPermission("infractionmanager.types.extra")) {
+							sb.append("  &aDecay:&e " + infraction.getDecay() + " days\n");
+							sb.append("  &aPunishments:&e \n");
+							for (Map.Entry<Integer, String> entry : infraction.getPunishments().entrySet()) {
+								sb.append("    &a" + entry.getKey() + ":&e " + entry.getValue() + " \n");
+							}
 						}
 					}
 
@@ -601,9 +610,8 @@ public class Executor implements CommandExecutor {
 
 				switch (mode) {
 					case "p":
-						List<String> pls = Lists.newArrayList();
-						Arrays.stream(Bukkit.getOfflinePlayers()).forEach(pl -> pls.add(pl.getName().toLowerCase()));
-						if (pls.contains(check))
+						OfflinePlayer pl = Bukkit.getOfflinePlayer(check);
+						if (pl.hasPlayedBefore())
 							players.add(check);
 						break;
 					case "t":

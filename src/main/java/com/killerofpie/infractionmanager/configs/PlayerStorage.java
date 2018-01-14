@@ -109,13 +109,15 @@ public class PlayerStorage {
 		Map<String, Integer> count = Maps.newHashMap();
 
 		for (String key : config.getKeys(false)) {
-			int counter = 0;
-			for (String num : config.getConfigurationSection(key).getKeys(false)) {
-				if (!olderThan(config.getString(key + "." + num + ".time"), plugin.getTypeConfig().readInfraction(key).getDecay())) {
-					counter++;
+			if (!key.equalsIgnoreCase("ResetOn")) {
+				int counter = 0;
+				for (String num : config.getConfigurationSection(key).getKeys(false)) {
+					if (!olderThan(config.getString(key + "." + num + ".time"), plugin.getTypeConfig().readInfraction(key).getDecay())) {
+						counter++;
+					}
 				}
+				count.put(key, counter);
 			}
-			count.put(key, counter);
 		}
 
 		return count;

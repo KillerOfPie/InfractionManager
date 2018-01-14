@@ -44,7 +44,7 @@ public class Updater {
 		log = Bukkit.getPluginManager().getPlugin("InfractionManager").getLogger();
 
 		try {
-			url = new URL("https://api.spigotmc.org/legacy/update.php?resource=0000"); // Edit API URL. todo
+			url = new URL("https://api.spigotmc.org/legacy/update.php?resource=52022"); // Edit API URL.
 		} catch (MalformedURLException ex) {
 			log.log(Level.WARNING, "Error: Bad URL while checking {0} !", pdf.getName());
 		}
@@ -94,7 +94,7 @@ public class Updater {
 					log.log(Level.WARNING, "[Updater] +------------------------------------------------+");
 					log.log(Level.WARNING, "[Updater] You are running an outdated version of the plugin!");
 					log.log(Level.WARNING, "[Updater] Most recent stable version: " + inputLine);
-					log.log(Level.WARNING, "[Updater] Please update asap from: Add later"); //todo
+					log.log(Level.WARNING, "[Updater] Please update asap from: https://goo.gl/vTwXeV");
 					log.log(Level.WARNING, "[Updater] +------------------------------------------------+");
 					in.close();
 					return RelationalStatus.BEHIND;
