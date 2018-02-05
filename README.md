@@ -20,6 +20,6 @@ This plugin helps server staff track and manage players who break server rules.
 
 
 # Commands & Permissions
-[Commands](Commands)
+[Commands](https://github.com/KillerOfPie/InfractionManager/)
 
 #### The current version is marked as BETA as significant changes/fixes were introduced. This means that it is very likely that there will be bugs.
