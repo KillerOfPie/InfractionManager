@@ -12,14 +12,14 @@ This plugin helps server staff track and manage players who break server rules.
 
 
 ## Downloads
-Not currently available.
+[Download on spigot](https://www.spigotmc.org/resources/infractionmanager.52022/)
 
 
 ## Discussion
-Not currently available.
+[Discuss on Spigot](https://www.spigotmc.org/threads/infractionmanager.296746/)
 
 
 # Commands & Permissions
-Not currently available.
+[Commands](Commands)
 
 #### The current version is marked as BETA as significant changes/fixes were introduced. This means that it is very likely that there will be bugs.
