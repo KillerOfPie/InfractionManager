@@ -56,6 +56,10 @@ public class PlayerStorage {
 			config.set((i - 1) + "", config.get(i + ""));
 			config.set(i + "", null);
 		}
+		
+		if(config.getConfigurationSection(type).getKeys(false).size() == 0 {
+			config.set(type, null);
+		}
 
 		save();
 	}
@@ -86,7 +90,7 @@ public class PlayerStorage {
 				}
 			}
 		}
-
+		
 		return infractions;
 	}
 
