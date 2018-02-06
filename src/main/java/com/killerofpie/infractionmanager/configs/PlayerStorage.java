@@ -32,6 +32,7 @@ public class PlayerStorage {
 	}
 
 	public void addInfraction(Infraction infraction) {
+		addPlayerName();
 		int num = 1;
 		String typeName = infraction.getType().getName();
 
@@ -45,6 +46,7 @@ public class PlayerStorage {
 	}
 
 	public void removeInfraction(String type, int num) {
+		addPlayerName();
 		String path = type + "." + num;
 		if (!config.contains(path)) {
 			return;
@@ -55,6 +57,10 @@ public class PlayerStorage {
 		for (int i = num + 1; i < config.getConfigurationSection(type).getKeys(false).size(); i++) {
 			config.set((i - 1) + "", config.get(i + ""));
 			config.set(i + "", null);
+		}
+
+		if (config.getConfigurationSection(type).getKeys(false).size() == 0) {
+			config.set(type, null);
 		}
 
 		save();
@@ -86,7 +92,7 @@ public class PlayerStorage {
 				}
 			}
 		}
-
+		
 		return infractions;
 	}
 
@@ -98,7 +104,7 @@ public class PlayerStorage {
 		Map<String, Integer> count = Maps.newHashMap();
 
 		for (String key : config.getKeys(false)) {
-			if (!key.equalsIgnoreCase("ResetOn"))
+			if (!(key.equalsIgnoreCase("ResetOn") || key.equalsIgnoreCase("Player-Name")))
 				count.put(key, config.getConfigurationSection(key).getKeys(false).size());
 		}
 
@@ -109,7 +115,7 @@ public class PlayerStorage {
 		Map<String, Integer> count = Maps.newHashMap();
 
 		for (String key : config.getKeys(false)) {
-			if (!key.equalsIgnoreCase("ResetOn")) {
+			if (!(key.equalsIgnoreCase("ResetOn") || key.equalsIgnoreCase("Player-Name"))) {
 				int counter = 0;
 				for (String num : config.getConfigurationSection(key).getKeys(false)) {
 					if (!olderThan(config.getString(key + "." + num + ".time"), plugin.getTypeConfig().readInfraction(key).getDecay())) {
@@ -125,7 +131,7 @@ public class PlayerStorage {
 
 	public void clearInfractions() {
 		for (String key : config.getKeys(false)) {
-			if (!key.equalsIgnoreCase("ResetOn")) {
+			if (!(key.equalsIgnoreCase("ResetOn") || key.equalsIgnoreCase("Player-Name"))) {
 				config.set(key, null);
 			}
 		}
@@ -160,8 +166,13 @@ public class PlayerStorage {
 		config = YamlConfiguration.loadConfiguration(file);
 	}
 
+	private void addPlayerName() {
+		if (!config.contains("Player-Name")) {
+			config.set("Player-Name", Bukkit.getOfflinePlayer(uuid).getName());
+		}
+	}
+
 	private boolean olderThan(String date, int daysOld) {
 		return LocalDate.parse(date).isBefore(LocalDate.now().minusDays(daysOld));
 	}
-
 }

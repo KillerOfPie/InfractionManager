@@ -33,10 +33,17 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
+import java.io.File;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -54,10 +61,10 @@ public class Executor implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		//subCommands: new/create, view/check, remove/delete, reset, help, reload, type,  params
-		//commandPerm: create    view -.other  remove         reset  n/a   reload  create n/a
+		//subCommands: new/create, view/check, remove/delete, reset, help, reload, types,  params, import
+		//commandPerm: create    view -.other  remove         reset  n/a   reload  create   n/a    *console only*
 		//otherThings: receiveBroadcast
-		//other Perms: notify
+		//other Perms: notify                                                      types.extra
 		//perm Prefix: InfractionManager.
 
 		if (cmd.getName().equalsIgnoreCase("infraction")) {
@@ -105,7 +112,7 @@ public class Executor implements CommandExecutor {
 				if (sender.hasPermission("InfractionManager.create")) {
 					sb.append("&a/infraction create <p> <t> <r> \n  &e- Creates a infraction on the player(s)");
 					sb.append("\n");
-					sb.append("&a/infraction types [pg] [l] [d] \n  &e- Lists available infraction types");
+					sb.append("&a/infraction types [pg] [l] \n  &e- Lists available infraction types");
 					sb.append("\n");
 				}
 
@@ -235,7 +242,7 @@ public class Executor implements CommandExecutor {
 						}
 
 						if ((sb.charAt(sb.length() - 1) + "").equalsIgnoreCase("0")) {
-							sb.append("&e" + player + " has no infractions.");
+							sb.append("&e" + player.getName() + " has no infractions.");
 						}
 
 						sb.append("&2To see a list of infractions use the parameter: 't <type>'");
@@ -422,6 +429,13 @@ public class Executor implements CommandExecutor {
 						reason = argMap.get("reason").toString();
 				LocalDate date = LocalDate.now();
 				UUID[] uuids = new UUID[players.size()];
+				UUID officer;
+
+				if (sender instanceof Player) {
+					officer = ((Player) sender).getUniqueId();
+				} else {
+					officer = Bukkit.getOfflinePlayer("Console").getUniqueId();
+				}
 				StringBuilder sb = new StringBuilder();
 
 				if (players.size() < 1) {
@@ -440,7 +454,7 @@ public class Executor implements CommandExecutor {
 					uuids[i] = Bukkit.getOfflinePlayer(pls[i]).getUniqueId();
 				}
 
-				Infraction infraction = new Infraction(type, uuids, date, reason);
+				Infraction infraction = new Infraction(type, uuids, date, reason, officer);
 
 				for (UUID uuid : uuids) {
 					ConsoleCommandSender console = Bukkit.getConsoleSender();
@@ -547,6 +561,7 @@ public class Executor implements CommandExecutor {
 				sb.append("&2To change the results per page use the parameter: 'l <number>'");
 
 				sender.sendMessage(colorize(sb.toString()));
+				return true;
 			}
 
 			//Params command
@@ -566,6 +581,59 @@ public class Executor implements CommandExecutor {
 				sb.append("&e [PG] - page number");
 
 				sender.sendMessage(colorize(sb.toString()));
+			} else if (args[0].equalsIgnoreCase("import")) {
+				sender.sendMessage(colorize("&6Importing currently only works for WarningManager, if there are other plugins you would like to be able to import from please let me know."));
+				if (plugin.getConfig().getBoolean("hasImported")) {
+					sender.sendMessage(colorize("&4You have already imported infractions from another plugin."));
+					return true;
+				}
+
+				if (Bukkit.getServer().getOnlinePlayers().size() > 0) {
+					sender.sendMessage(colorize("&4Please read our wiki page on this feature before using it. https://github.com/KillerOfPie/InfractionManager/wiki/Import"));
+					return true;
+				}
+
+				if (sender instanceof Player) {
+					sender.sendMessage(colorize("&4Please read our wiki page on this feature before using it. https://github.com/KillerOfPie/InfractionManager/wiki/Import"));
+					return true;
+				}
+
+				sender.sendMessage(colorize("&6Importing, please do not stop the server or allow players on until the finished message appears."));
+
+				File file = new File("plugins/WarningManager/warnings.yml");
+				if (!file.exists()) {
+					sender.sendMessage(colorize("&4Could not find a file to import. Import cancelled!"));
+					return true;
+				}
+				FileConfiguration importConfig = YamlConfiguration.loadConfiguration(file);
+
+				for (String key : importConfig.getKeys(false)) {
+
+					sender.sendMessage(colorize("&eMoving player: " + key));
+					ConfigurationSection sec = importConfig.getConfigurationSection(key);
+					PlayerStorage ps = new PlayerStorage(Bukkit.getOfflinePlayer(key).getUniqueId());
+
+					for (int i = 1; i <= sec.getInt("Total-Warnings"); i++) {
+
+						sender.sendMessage(colorize("    - &eMoving warning: " + i));
+						ConfigurationSection num = sec.getConfigurationSection(i + "");
+						String type = num.getString("Type"),
+								reason = num.getString("Reason");
+
+						UUID receiver = Bukkit.getOfflinePlayer(key).getUniqueId(),
+								officer = Bukkit.getOfflinePlayer(num.getString("Sender")).getUniqueId();
+
+						LocalDate date = LocalDateTime.ofInstant(((Date) num.get("Date")).toInstant(), ZoneId.systemDefault()).toLocalDate();
+
+						ps.addInfraction(new Infraction(type, receiver, date, reason, officer));
+					}
+				}
+
+				sender.sendMessage(colorize("&2Import complete."));
+				plugin.getConfig().set("hasImported", true);
+				plugin.saveConfig();
+
+				return true;
 			}
 		}
 		return false;

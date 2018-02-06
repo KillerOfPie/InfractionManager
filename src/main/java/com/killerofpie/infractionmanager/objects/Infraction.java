@@ -22,6 +22,8 @@
 package com.killerofpie.infractionmanager.objects;
 
 import com.killerofpie.infractionmanager.util.InfractionType;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -36,39 +38,44 @@ public class Infraction {
 	private LocalDate time;
 	private String reason;
 	private InfractionType type;
+	private UUID sender;
 
-	public Infraction(String type, UUID[] players, LocalDate time, String reason) {
+	public Infraction(String type, UUID[] players, LocalDate time, String reason, UUID sender) {
 		this.type = new InfractionType(type);
 		this.players = players;
 		this.time = time;
 		this.reason = reason;
+		this.sender = sender;
 
 		uuidToStrings();
 	}
 
-	public Infraction(String type, UUID player, LocalDate time, String reason) {
+	public Infraction(String type, UUID player, LocalDate time, String reason, UUID sender) {
 		this.type = new InfractionType(type);
-		this.players[0] = player;
+		this.players = new UUID[]{player};
 		this.time = time;
 		this.reason = reason;
+		this.sender = sender;
 
 		uuidToStrings();
 	}
 
-	public Infraction(String type, String[] players, LocalDate time, String reason) {
+	public Infraction(String type, String[] players, LocalDate time, String reason, UUID sender) {
 		this.type = new InfractionType(type);
 		this.playersString = players;
 		this.time = time;
 		this.reason = reason;
+		this.sender = sender;
 
 		stringToUUIDs();
 	}
 
-	public Infraction(String type, String player, LocalDate time, String reason) {
+	public Infraction(String type, String player, LocalDate time, String reason, UUID sender) {
 		this.type = new InfractionType(type);
-		this.playersString[0] = player;
+		this.playersString = new String[]{player};
 		this.time = time;
 		this.reason = reason;
+		this.sender = sender;
 
 		stringToUUIDs();
 	}
@@ -89,12 +96,21 @@ public class Infraction {
 		return type;
 	}
 
+	public UUID getSenderUUID() {
+		return sender;
+	}
+
+	public Player getSenderPlayer() {
+		return Bukkit.getPlayer(sender);
+	}
+
 	public Map<String, Object> toMap() {
 		Map<String, Object> tempMap = new TreeMap<>();
 		tempMap.put("type", type.getName());
 		tempMap.put("players", playersString);
 		tempMap.put("reason", reason);
 		tempMap.put("time", time.toString());
+		tempMap.put("sender", sender.toString());
 
 		return tempMap;
 	}
@@ -109,8 +125,13 @@ public class Infraction {
 		LocalDate time = LocalDate.parse(map.get("time").toString());
 		String reason = map.get("reason").toString();
 		String type = map.get("type").toString();
+		UUID sender = UUID.fromString(map.get("sender").toString());
 
-		return new Infraction(type, players, time, reason);
+		if (sender == null) {
+			sender = Bukkit.getOfflinePlayer("Server").getUniqueId();
+		}
+
+		return new Infraction(type, players, time, reason, sender);
 	}
 
 	private void uuidToStrings() {

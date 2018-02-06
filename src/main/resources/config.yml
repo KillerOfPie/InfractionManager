@@ -1,4 +1,25 @@
+###             ###
+# Utility Options #
+###             ###
+
+# Would you like the plugin to notify you if there are newer versions available?
 check-for-updates: true
+# Are you okay with allowing the plugin to send out anonymous usage information?
+# All information that is collected can be viewed here: https://bstats.org/plugin/bukkit/InfractionManager
 allow-metrics: true
+
+###            ###
+# Plugin Options #
+###            ###
+
+# Do you want to broadcast to the server when someone is warned?
 broadcast: false
+# Do you want Infractions to decay after a certain amount of time?
 enable-decay: true
+
+###            ###
+# !Do Not Touch! #
+###            ###
+
+# Changing any settings below this can have negative affects on the plugin, please do not change.
+hasImported: false
