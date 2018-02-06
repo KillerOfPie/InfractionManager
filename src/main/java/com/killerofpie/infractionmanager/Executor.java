@@ -54,10 +54,10 @@ public class Executor implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		//subCommands: new/create, view/check, remove/delete, reset, help, reload, type,  params
-		//commandPerm: create    view -.other  remove         reset  n/a   reload  create n/a
+		//subCommands: new/create, view/check, remove/delete, reset, help, reload, types,  params
+		//commandPerm: create    view -.other  remove         reset  n/a   reload  create   n/a
 		//otherThings: receiveBroadcast
-		//other Perms: notify
+		//other Perms: notify                                                      types.extra
 		//perm Prefix: InfractionManager.
 
 		if (cmd.getName().equalsIgnoreCase("infraction")) {
@@ -105,7 +105,7 @@ public class Executor implements CommandExecutor {
 				if (sender.hasPermission("InfractionManager.create")) {
 					sb.append("&a/infraction create <p> <t> <r> \n  &e- Creates a infraction on the player(s)");
 					sb.append("\n");
-					sb.append("&a/infraction types [pg] [l] [d] \n  &e- Lists available infraction types");
+					sb.append("&a/infraction types [pg] [l] \n  &e- Lists available infraction types");
 					sb.append("\n");
 				}
 
@@ -223,7 +223,7 @@ public class Executor implements CommandExecutor {
 						Map<String, Integer> countsTotal = ps.getTotalInfractionCount(),
 								countsDecay = ps.getDecayInfractionCount();
 
-						sb.append("&2Infractions of " + player.getName() + "\n");
+						sb.append("&2Infractions of " + player.getDisplayName() + "\n");
 						sb.append("&aInfraction Type-Total-Active \n&0");
 
 						for (String key : countsTotal.keySet()) {

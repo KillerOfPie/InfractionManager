@@ -32,6 +32,7 @@ public class PlayerStorage {
 	}
 
 	public void addInfraction(Infraction infraction) {
+		addPlayerName();
 		int num = 1;
 		String typeName = infraction.getType().getName();
 
@@ -45,6 +46,7 @@ public class PlayerStorage {
 	}
 
 	public void removeInfraction(String type, int num) {
+		addPlayerName();
 		String path = type + "." + num;
 		if (!config.contains(path)) {
 			return;
@@ -56,8 +58,8 @@ public class PlayerStorage {
 			config.set((i - 1) + "", config.get(i + ""));
 			config.set(i + "", null);
 		}
-		
-		if(config.getConfigurationSection(type).getKeys(false).size() == 0 {
+
+		if (config.getConfigurationSection(type).getKeys(false).size() == 0) {
 			config.set(type, null);
 		}
 
@@ -129,7 +131,7 @@ public class PlayerStorage {
 
 	public void clearInfractions() {
 		for (String key : config.getKeys(false)) {
-			if (!key.equalsIgnoreCase("ResetOn")) {
+			if (!(key.equalsIgnoreCase("ResetOn") || key.equalsIgnoreCase("Player-Name"))) {
 				config.set(key, null);
 			}
 		}
@@ -164,8 +166,13 @@ public class PlayerStorage {
 		config = YamlConfiguration.loadConfiguration(file);
 	}
 
+	private void addPlayerName() {
+		if (!config.contains("Player-Name")) {
+			config.set("Player-Name", Bukkit.getPlayer(uuid).getDisplayName());
+		}
+	}
+
 	private boolean olderThan(String date, int daysOld) {
 		return LocalDate.parse(date).isBefore(LocalDate.now().minusDays(daysOld));
 	}
-
 }
