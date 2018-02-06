@@ -242,7 +242,7 @@ public class Executor implements CommandExecutor {
 						}
 
 						if ((sb.charAt(sb.length() - 1) + "").equalsIgnoreCase("0")) {
-							sb.append("&e" + player + " has no infractions.");
+							sb.append("&e" + player.getName() + " has no infractions.");
 						}
 
 						sb.append("&2To see a list of infractions use the parameter: 't <type>'");
