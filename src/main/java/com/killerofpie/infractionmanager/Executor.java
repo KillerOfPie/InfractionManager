@@ -230,7 +230,7 @@ public class Executor implements CommandExecutor {
 						Map<String, Integer> countsTotal = ps.getTotalInfractionCount(),
 								countsDecay = ps.getDecayInfractionCount();
 
-						sb.append("&2Infractions of " + player.getDisplayName() + "\n");
+						sb.append("&2Infractions of " + player.getName() + "\n");
 						sb.append("&aInfraction Type-Total-Active \n&0");
 
 						for (String key : countsTotal.keySet()) {
