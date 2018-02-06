@@ -104,7 +104,7 @@ public class PlayerStorage {
 		Map<String, Integer> count = Maps.newHashMap();
 
 		for (String key : config.getKeys(false)) {
-			if (!key.equalsIgnoreCase("ResetOn"))
+			if (!(key.equalsIgnoreCase("ResetOn") || key.equalsIgnoreCase("Player-Name")))
 				count.put(key, config.getConfigurationSection(key).getKeys(false).size());
 		}
 
@@ -115,7 +115,7 @@ public class PlayerStorage {
 		Map<String, Integer> count = Maps.newHashMap();
 
 		for (String key : config.getKeys(false)) {
-			if (!key.equalsIgnoreCase("ResetOn")) {
+			if (!(key.equalsIgnoreCase("ResetOn") || key.equalsIgnoreCase("Player-Name"))) {
 				int counter = 0;
 				for (String num : config.getConfigurationSection(key).getKeys(false)) {
 					if (!olderThan(config.getString(key + "." + num + ".time"), plugin.getTypeConfig().readInfraction(key).getDecay())) {
