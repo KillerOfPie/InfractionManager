@@ -41,6 +41,9 @@ import org.bukkit.plugin.PluginDescriptionFile;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -605,17 +608,30 @@ public class Executor implements CommandExecutor {
 				FileConfiguration importConfig = YamlConfiguration.loadConfiguration(file);
 
 				for (String key : importConfig.getKeys(false)) {
+
+					sender.sendMessage(colorize("&eMoving player: " + key));
 					ConfigurationSection sec = importConfig.getConfigurationSection(key);
 					PlayerStorage ps = new PlayerStorage(Bukkit.getOfflinePlayer(key).getUniqueId());
+
 					for (int i = 1; i <= sec.getInt("Total-Warnings"); i++) {
+
+						sender.sendMessage(colorize("    - &eMoving warning: " + i));
 						ConfigurationSection num = sec.getConfigurationSection(i + "");
-						Infraction inf = new Infraction(num.getString("Type"), Bukkit.getOfflinePlayer(key).getUniqueId(), LocalDate.parse(num.getString("Date").split("T")[0]), num.getString("Reason"), Bukkit.getOfflinePlayer(num.getString("Sender")).getUniqueId());
-						ps.addInfraction(inf);
+						String type = num.getString("Type"),
+								reason = num.getString("Reason");
+
+						UUID receiver = Bukkit.getOfflinePlayer(key).getUniqueId(),
+								officer = Bukkit.getOfflinePlayer(num.getString("Sender")).getUniqueId();
+
+						LocalDate date = LocalDateTime.ofInstant(((Date) num.get("Date")).toInstant(), ZoneId.systemDefault()).toLocalDate();
+
+						ps.addInfraction(new Infraction(type, receiver, date, reason, officer));
 					}
 				}
 
 				sender.sendMessage(colorize("&2Import complete."));
 				plugin.getConfig().set("hasImported", true);
+				plugin.saveConfig();
 
 				return true;
 			}

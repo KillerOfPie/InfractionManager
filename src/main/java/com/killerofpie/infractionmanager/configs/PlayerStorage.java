@@ -168,7 +168,7 @@ public class PlayerStorage {
 
 	private void addPlayerName() {
 		if (!config.contains("Player-Name")) {
-			config.set("Player-Name", Bukkit.getPlayer(uuid).getDisplayName());
+			config.set("Player-Name", Bukkit.getOfflinePlayer(uuid).getName());
 		}
 	}
 
