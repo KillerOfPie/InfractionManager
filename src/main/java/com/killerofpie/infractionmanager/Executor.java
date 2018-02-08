@@ -211,6 +211,12 @@ public class Executor implements CommandExecutor {
 				Set<String> players = (Set<String>) argMap.get("players");
 				String type = argMap.get("type").toString();
 
+				if (args.length == 2) {
+					if (Bukkit.getOfflinePlayer(args[1]).hasPlayedBefore()) {
+						players.add(args[1]);
+					}
+				}
+
 				if (!sender.hasPermission("InfractionManager.view") && sender instanceof Player) {
 					sender.sendMessage("&cYou don't have permission for that!");
 					return true;
