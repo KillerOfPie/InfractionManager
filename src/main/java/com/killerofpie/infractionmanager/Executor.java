@@ -242,7 +242,7 @@ public class Executor implements CommandExecutor {
 						}
 
 						if ((sb.charAt(sb.length() - 1) + "").equalsIgnoreCase("0")) {
-							sb.append("&e" + player.getName() + " has no infractions.");
+							sb.append("&e" + player.getName() + " has no infractions.\n");
 						}
 
 						sb.append("&2To see a list of infractions use the parameter: 't <type>'");
@@ -273,7 +273,7 @@ public class Executor implements CommandExecutor {
 							}
 
 							if ((sb.charAt(sb.length() - 1) + "").equalsIgnoreCase("0")) {
-								sb.append("&e" + player + " has no infractions.");
+								sb.append("&e" + player + " has no infractions.\n");
 							}
 
 						}
@@ -339,7 +339,7 @@ public class Executor implements CommandExecutor {
 						}
 
 						if ((sb.charAt(sb.length() - 1) + "").equalsIgnoreCase("0")) {
-							sb.append("&e" + player + " has no infractions.");
+							sb.append("&e" + player + " has no infractions.\n");
 						}
 
 						sb.append("&2To see a different page use the parameter: 'pg <number>'\n");
@@ -402,7 +402,7 @@ public class Executor implements CommandExecutor {
 							}
 
 							if ((sb.charAt(sb.length() - 1) + "").equalsIgnoreCase("0")) {
-								sb.append("&e" + player + " has no infractions.");
+								sb.append("&e" + player + " has no infractions.\n");
 							}
 						}
 
@@ -427,6 +427,7 @@ public class Executor implements CommandExecutor {
 				Set<String> players = (Set<String>) argMap.get("players");
 				String type = argMap.get("type").toString(),
 						reason = argMap.get("reason").toString();
+				Boolean execute = Boolean.parseBoolean(argMap.get("execute").toString());
 				LocalDate date = LocalDate.now();
 				UUID[] uuids = new UUID[players.size()];
 				UUID officer;
@@ -465,7 +466,7 @@ public class Executor implements CommandExecutor {
 					int num = ps.getInfractionCountOfType(type, plugin.getConfig().getBoolean("enable-decay"));
 					InfractionType infractionType = plugin.getTypeConfig().readInfraction(type);
 
-					if (!infractionType.getPunishment(num).equalsIgnoreCase("")) {
+					if ((!infractionType.getPunishment(num).equalsIgnoreCase("")) && execute) {
 						plugin.getServer().dispatchCommand(console, infractionType.getPunishment(num)
 								.replaceAll("%player%", Bukkit.getOfflinePlayer(uuid).getName())
 								.replaceAll("%sender%", sender.getName())
@@ -578,6 +579,7 @@ public class Executor implements CommandExecutor {
 				sb.append("&e  [N]  - number(s)\n");
 				sb.append("&e  [L]  - limit per page\n");
 				sb.append("&e  [D]  - decay (true/false)\n");
+				sb.append("&e  [E]  - execute (true/false)\n");
 				sb.append("&e [PG] - page number");
 
 				sender.sendMessage(colorize(sb.toString()));
@@ -641,7 +643,7 @@ public class Executor implements CommandExecutor {
 
 	private Map<String, Object> parseArgs(String[] args) {
 		String mode = "", type = "";
-		boolean decay = true;
+		boolean decay = true, execute = true;
 		int limit = 3, page = 1;
 		StringBuilder reason = new StringBuilder();
 		Map<String, Object> ret = new HashMap<>();
@@ -652,7 +654,8 @@ public class Executor implements CommandExecutor {
 				numberKeys = Sets.newHashSet("num", "number", "numbers", "n"),
 				limitKeys = Sets.newHashSet("limit", "l"),
 				decayKeys = Sets.newHashSet("decay", "decayed", "d"),
-				pageKeys = Sets.newHashSet("page", "pg");
+				pageKeys = Sets.newHashSet("page", "pg"),
+				executeKeys = Sets.newHashSet("execute", "e");
 
 		Set<Integer> numbers = new HashSet<>();
 
@@ -674,6 +677,8 @@ public class Executor implements CommandExecutor {
 				mode = "d";
 			} else if (pageKeys.contains(check)) {
 				mode = "pg";
+			} else if (executeKeys.contains(check)) {
+				mode = "e";
 			} else {
 
 				switch (mode) {
@@ -697,9 +702,14 @@ public class Executor implements CommandExecutor {
 							limit = Integer.parseInt(check);
 						break;
 					case "d":
-						if (check.equalsIgnoreCase("true")
+						if (check.equalsIgnoreCase("no")
 								|| check.equalsIgnoreCase("false"))
-							decay = Boolean.parseBoolean(check);
+							decay = false;
+						break;
+					case "e":
+						if (check.equalsIgnoreCase("no")
+								|| check.equalsIgnoreCase("false"))
+							execute = false;
 						break;
 					case "pg":
 						if (isInt(check) && Integer.parseInt(check) > 0)
@@ -719,6 +729,7 @@ public class Executor implements CommandExecutor {
 		ret.put("decay", decay);
 		ret.put("limit", limit);
 		ret.put("page", page);
+		ret.put("execute", execute);
 
 		return ret;
 	}
