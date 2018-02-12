@@ -52,7 +52,7 @@ public class Infraction {
 
 	public Infraction(String type, UUID player, LocalDate time, String reason, UUID sender) {
 		this.type = new InfractionType(type);
-		this.players = new UUID[]{player};
+		this.players[0] = player;
 		this.time = time;
 		this.reason = reason;
 		this.sender = sender;
@@ -72,7 +72,7 @@ public class Infraction {
 
 	public Infraction(String type, String player, LocalDate time, String reason, UUID sender) {
 		this.type = new InfractionType(type);
-		this.playersString = new String[]{player};
+		this.playersString[0] = player;
 		this.time = time;
 		this.reason = reason;
 		this.sender = sender;
