@@ -6,7 +6,7 @@
 
     <groupId>com.killerofpie</groupId>
     <artifactId>infractionmanager</artifactId>
-    <version>1.0.3-BETA</version>
+    <version>1.0.5-BETA</version>
     <name>InfractionManager</name>
     <url>http://maven.apache.org</url>
 
