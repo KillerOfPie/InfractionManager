@@ -51,7 +51,6 @@ public class InfractionCommand {
 	ConsoleCommandSender console = Bukkit.getConsoleSender();
 
 	LocalDate date = LocalDate.now();
-	UUID[] uuids = new UUID[players.size()];
 	UUID officer;
 
 
@@ -60,9 +59,9 @@ public class InfractionCommand {
 		this.cmdType = cmdType;
 		this.args = args;
 
-		parseArgs(args);
+		parseArgs();
 
-		if (args.length == 2 && players.size() != 0) {
+		if (args.length == 2 && players.size() > 0) {
 			if (Bukkit.getOfflinePlayer(args[1]).hasPlayedBefore()) {
 				players.add(args[1]);
 			}
@@ -276,6 +275,7 @@ public class InfractionCommand {
 		}
 
 		sender.sendMessage(colorize(sb.toString()));
+		plugin.getLocalLog().logReset(sender.getName(), players);
 
 	}
 
@@ -306,8 +306,9 @@ public class InfractionCommand {
 			return;
 		}
 
+		UUID[] uuids = new UUID[players.size()];
 		String[] pls = players.toArray(new String[0]);
-		for (int i = 0; i < players.size(); i++) {
+		for (int i = 0; i < pls.length; i++) {
 			uuids[i] = Bukkit.getOfflinePlayer(pls[i]).getUniqueId();
 		}
 
@@ -374,6 +375,8 @@ public class InfractionCommand {
 				player.sendMessage(colorize(broadcast.toString()));
 			}
 		}
+
+		plugin.getLocalLog().logCreate(infraction);
 	}
 
 	private void importCmd() {
@@ -403,15 +406,20 @@ public class InfractionCommand {
 		}
 		FileConfiguration importConfig = YamlConfiguration.loadConfiguration(file);
 
+		int importedWarnings = 0,
+				importedPlayers = 0;
+
 		for (String key : importConfig.getKeys(false)) {
 
 			sender.sendMessage(colorize("&eMoving player: " + key));
+			importedPlayers++;
 			ConfigurationSection sec = importConfig.getConfigurationSection(key);
 			PlayerStorage ps = new PlayerStorage(Bukkit.getOfflinePlayer(key).getUniqueId());
 
 			for (int i = 1; i <= sec.getInt("Total-Warnings"); i++) {
 
 				sender.sendMessage(colorize("    - &eMoving warning: " + i));
+				importedWarnings++;
 				ConfigurationSection num = sec.getConfigurationSection(i + "");
 				String type = num.getString("Type"),
 						reason = num.getString("Reason");
@@ -428,6 +436,8 @@ public class InfractionCommand {
 		plugin.getConfig().set("hasImported", true);
 		plugin.saveConfig();
 		sender.sendMessage(colorize("&2Import complete."));
+
+		plugin.getLocalLog().log("Imported " + importedPlayers + " players with " + importedWarnings + " warnings! <- End Of Import");
 	}
 
 	private void reloadCmd() {
@@ -470,6 +480,7 @@ public class InfractionCommand {
 			PlayerStorage ps = new PlayerStorage(Bukkit.getOfflinePlayer(player).getUniqueId());
 
 			for (int i : numbers) {
+				plugin.getLocalLog().logRemove(sender.getName(), player, ps.getInfraction(type, i));
 				ps.removeInfraction(type, i);
 			}
 
@@ -624,12 +635,11 @@ public class InfractionCommand {
 	/**
 	 * This function takes an arg array and sorts it into a map of all arguments
 	 *
-	 * @param args Arg array from bukkit command.
 	 * @return Argument map.
 	 */
-	private void parseArgs(String[] args) {
+	private void parseArgs() {
 		String mode = "";
-		StringBuilder reason = new StringBuilder();
+		StringBuilder reasonb = new StringBuilder();
 		Set<String> playerKeys = Sets.newHashSet("player", "players", "p"),
 				typeKeys = Sets.newHashSet("type", "t"),
 				reasonKeys = Sets.newHashSet("reason", "reasons", "r"),
@@ -670,7 +680,7 @@ public class InfractionCommand {
 						type = check;
 						break;
 					case "r":
-						reason.append(check + " ");
+						reasonb.append(check + " ");
 						break;
 					case "n":
 						if (isInt(check))
@@ -700,6 +710,8 @@ public class InfractionCommand {
 				}
 			}
 		}
+
+		reason = reasonb.toString();
 	}
 
 	/**

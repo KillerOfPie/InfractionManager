@@ -44,7 +44,11 @@ public class Executor implements CommandExecutor {
 		//perm Prefix: InfractionManager.
 
 		if (cmd.getName().equalsIgnoreCase("infraction")) {
-			new InfractionCommand(sender, CommandType.getCommandType(args[0]), args);
+			if (args.length > 0) {
+				new InfractionCommand(sender, CommandType.getCommandType(args[0]), args);
+			} else {
+				new InfractionCommand(sender, CommandType.NONE, args);
+			}
 			return true;
 		}
 		return false;
