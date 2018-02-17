@@ -21,6 +21,7 @@
 
 package com.killerofpie.infractionmanager;
 
+import com.killerofpie.infractionmanager.configs.InfractionLogger;
 import com.killerofpie.infractionmanager.configs.TypeConfig;
 import com.killerofpie.infractionmanager.util.BukkitVersion;
 import com.killerofpie.infractionmanager.util.Updater;
@@ -31,15 +32,21 @@ public class InfractionManager extends JavaPlugin {
 	private final BukkitVersion VERSION = new BukkitVersion();
 	private Metrics metrics;
 	private TypeConfig typeConfig;
+	private InfractionLogger localLog;
 
 	public TypeConfig getTypeConfig() {
 		return typeConfig;
+	}
+
+	public InfractionLogger getLocalLog() {
+		return localLog;
 	}
 
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
 		typeConfig = new TypeConfig(this);
+		localLog = new InfractionLogger(this);
 
 		getCommand("infraction").setExecutor(new Executor(this));
 
